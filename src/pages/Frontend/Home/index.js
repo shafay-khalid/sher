@@ -129,7 +129,7 @@ const HomePage = () => {
             {/* New Section for All Items */}
             <div className="container mt-5">
                 <h2 className="text-center text-white">All Items</h2>
-                <div className="row">
+                <div className="row mt-4">
                     {sortedItems.map((item) => (
                         <div key={item._id} className="col-6 col-md-3 mb-4">
                             <Link to={`/item/${item._id}`} className="text-decoration-none">

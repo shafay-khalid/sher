@@ -10,13 +10,13 @@ const { Title, Text } = Typography;
 
 const ItemDetails = () => {
     const { state } = useAuth();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const { id } = useParams();
     const [item, setItem] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedColor, setSelectedColor] = useState(''); // Initialize as empty string
 
     useEffect(() => {
         const fetchItemDetails = async () => {
@@ -24,7 +24,7 @@ const ItemDetails = () => {
                 const response = await axios.get(`http://localhost:5021/getItem/${id}`);
                 setItem(response.data);
                 if (response.data.colors.length > 0) {
-                    setSelectedColor(response.data.colors[0]); // Set default selected color
+                    setSelectedColor(''); // Ensure no color is selected by default
                 }
             } catch (error) {
                 console.error("Error fetching item details:", error);
@@ -39,17 +39,22 @@ const ItemDetails = () => {
 
     const totalPrice = item ? (item.sellingPrice * quantity).toFixed(2) : 0;
     const discountAmount = item ? (item.sellingPrice * (item.discount / 100)).toFixed(2) : 0; // Calculate discount amount
-    const discountedPrice = item ? (item.sellingPrice - discountAmount)*quantity.toFixed(2) : 0; // Calculate discounted price
+    const discountedPrice = item ? (item.sellingPrice - discountAmount) * quantity.toFixed(2) : 0; // Calculate discounted price
 
     const addToCart = async () => {
         if (!item) return;
-    
+
         if (!state.isAuthenticated) {
             message.warning("You need to log in to add items to the cart.");
             navigate('/auth/login');
             return;
         }
-    
+
+        if (!selectedColor) {
+            message.error("Please select a color before adding to cart."); // Show error message
+            return;
+        }
+
         const cartData = {
             itemId: item._id,
             quantity,
@@ -59,7 +64,7 @@ const ItemDetails = () => {
             selectedColor,
             imageUrl: item.imageUrls[currentImageIndex] // Pass the selected image URL
         };
-    
+
         try {
             await axios.post('http://localhost:5021/addToCart', cartData);
             message.success("Item added to cart successfully!");
@@ -111,7 +116,7 @@ const ItemDetails = () => {
     return (
         <>
             <div style={styles.itemDetailsPage}>
- <Row gutter={16} style={{ width: '100%', maxWidth: '1200px', margin: '80px auto', background: '#fff', padding: '30px', borderRadius: '10px' }}>
+                <Row gutter={16} style={{ width: '100%', maxWidth: '1200px', margin: '80px auto', background: '#fff', padding: '30px', borderRadius: '10px' }}>
                     <Col xs={24} md={12} style={styles.imageContainer}>
                         <LeftOutlined onClick={() => setCurrentImageIndex((currentImageIndex - 1 + item.imageUrls.length) % item.imageUrls.length)} style={{ ...styles.navIcon, left: '10px' }} />
                         <img
@@ -136,7 +141,7 @@ const ItemDetails = () => {
                             <Select
                                 style={{ width: '200px', marginLeft: '10px' }}
                                 onChange={handleColorChange}
-                                value={selectedColor}
+                                value={selectedColor || undefined} // Set to undefined if no color is selected
                             >
                                 {item.colors.map((color, index) => (
                                     <Select.Option key={index} value={color}>

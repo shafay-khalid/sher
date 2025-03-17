@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { useAuth } from '../../context/authContext';
@@ -9,12 +9,14 @@ import logo from '../../assets/images/logo2.png'; // Import your logo image
 export default function CustomNavbar() {
     const { state } = useAuth();
     const navigate = useNavigate();
+    const navbarRef = useRef(null); // Create a ref for the navbar
 
     const doSignOut = () => {
         return auth.signOut();
     };
 
     const [scrolled, setScrolled] = useState(false);
+    const [isOpen, setIsOpen] = useState(false); // State to manage navbar toggle
 
     useEffect(() => {
         const handleScroll = () => {
@@ -24,9 +26,24 @@ export default function CustomNavbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Handle clicks outside the navbar
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+                setIsOpen(false); // Close the navbar if clicked outside
+            }
+        };
+
+        window.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            window.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <header>
             <Navbar
+                ref={navbarRef} // Attach the ref to the Navbar
                 expand="lg"
                 style={{
                     background: 'linear-gradient(135deg, #000000, #16a34a)', // Black to dark green gradient
@@ -38,7 +55,7 @@ export default function CustomNavbar() {
                     left: 0,
                     right: 0,
                     zIndex: 1000,
-                    padding: '1px 0',
+                    padding: '3px 0',
                     boxShadow: scrolled ? '0 2px 15px rgba(0, 0, 0, 0.08)' : 'none'
                 }}
             >
@@ -53,7 +70,7 @@ export default function CustomNavbar() {
                             display: 'flex',
                             alignItems: 'center',
                             transition: 'transform 0.3s ease',
-                            padding: '3px 15px',
+                            padding: '8px 15px',
                             borderRadius: '8px',
                             background: 'transparent',
                             marginRight: 'auto' // Align to the left
@@ -70,7 +87,7 @@ export default function CustomNavbar() {
                         />
                         <span
                             style={{
-                                 color: '#22c55e',
+                                color: '#22c55e',
                                 background: 'linear-gradient(45deg, #16a34a, #22c55e)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
@@ -80,9 +97,12 @@ export default function CustomNavbar() {
                         </span>
                     </Navbar.Brand>
 
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Toggle 
+                        aria-controls="basic-navbar-nav" 
+                        onClick={() => setIsOpen(!isOpen)} // Toggle the navbar open state
+                    />
 
-                    <Navbar.Collapse id="basic-navbar-nav">
+                    <Navbar.Collapse id="basic-navbar-nav" in={isOpen}>
                         <Nav className="me-auto" style={{ justifyContent: 'center', flexGrow: 1 }}>
                             <Nav.Link as={Link} to="/" style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }} 
                                 onMouseEnter={(e) => {

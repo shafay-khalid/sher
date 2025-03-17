@@ -17,12 +17,16 @@ export default function Footer() {
           <div className="col-12 col-lg-4 col-md-6 col-sm-12">
             <h5>About our store</h5>
             <p>
-              Sharki Brand is owned by Muhammad Shafay. <br /> Marketing Manager is Abdul Wasay.
+              Sharki is owned by Muhammad Shafay. <br /> Marketing Manager is Abdul Wasay.
             </p>
             <h5>Social Accounts</h5>
             <p className='mt-2'>
-              <a > <InstagramOutlined style={{ fontSize: '24px', color: '#C13584', marginRight: '10px' }} /></a>
-              <a href='https://www.facebook.com/profile.php?id=61574013609695'> <FacebookOutlined style={{ fontSize: '24px', color: '#3b5998' }} /></a>
+              <a href='https://www.instagram.com/premium_pakistan/' target="_blank" rel="noopener noreferrer">
+                <InstagramOutlined style={{ fontSize: '24px', color: '#C13584', marginRight: '10px' }} />
+              </a>
+              <a href='https://www.facebook.com/profile.php?id=61574013609695' target="_blank" rel="noopener noreferrer">
+                <FacebookOutlined style={{ fontSize: '24px', color: '#3b5998' }} />
+              </a>
             </p>
           </div>
           <div className="col-12 col-lg-4 col-md-6 col-sm-12">
