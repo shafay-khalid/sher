@@ -11,6 +11,8 @@ const AuthContext = createContext();
 
 const initialState = { isAuthenticated: false, user: { fullName: '', email: '', uid: '', role: '' } };
 
+const api = 'https://backend-production-6ac7.up.railway.app/'
+
 const reducer = (state, { type, payload }) => {
   switch (type) {
     case "setLoggedIn":
@@ -59,7 +61,7 @@ export default function AuthProvider({ children }) { // Change the name here
 
   const storeUserInBackend = async (user) => {
     try {
-        const response = await axios.post('http://localhost:5021/storeUser', {
+        const response = await axios.post(`${api}storeUser`, {
             fullName: user.fullName,
             email: user.email,
             uid: user.uid,
