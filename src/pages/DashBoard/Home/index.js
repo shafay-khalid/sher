@@ -8,10 +8,11 @@ const { Title, Paragraph } = Typography;
 export default function Home({ searchQuery = '' }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const api = 'https://backend-production-6ac7.up.railway.app/'
 
   const getData = async () => {
     try {
-      const response = await axios.get("http://localhost:5021/getItems");
+      const response = await axios.get(`${api}getItems`);
       setData(response.data);
     } catch (error) {
       console.error("Error fetching menu items: ", error);
@@ -48,7 +49,7 @@ export default function Home({ searchQuery = '' }) {
                   cover={
                     item.imageUrls && item.imageUrls.length > 0 ? (
                       <Image
-                        src={`http://localhost:5021${item.imageUrls[0]}`}
+                        src={`${api}${item.imageUrls[0]}`}
                         alt={item.name}
                         preview={false}
                         style={{ height: "200px", objectFit: "cover" }}

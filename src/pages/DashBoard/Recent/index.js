@@ -10,11 +10,12 @@ export default function RecentOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('today'); 
+  const api = 'https://backend-production-6ac7.up.railway.app/'
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(`http://localhost:5021/getOrders`);
+        const response = await axios.get(`${api}getOrders`);
         setOrders(response.data);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -122,7 +123,7 @@ export default function RecentOrders() {
   ];
   const handleRemoveOrder = async (orderId) => {
     try {
-        await axios.delete(`http://localhost:5021/deleteOrder/${orderId}`);
+        await axios.delete(`${api}deleteOrder/${orderId}`);
         message.success("Order removed successfully!");
         setOrders(orders.filter(order => order._id !== orderId));
     } catch (error) {

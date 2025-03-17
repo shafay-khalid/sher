@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const { Title } = Typography;
 const { Option } = Select;
+const api = 'https://backend-production-6ac7.up.railway.app/'
 
 const initialItemState = { 
     name: "", 
@@ -77,7 +78,7 @@ export default function AddItems() {
                     formData.append('images', file.originFileObj);
                 });
     
-                const response = await axios.post('http://localhost:5021/uploadImages', formData, {
+                const response = await axios.post(`${api}uploadImages`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -107,7 +108,7 @@ export default function AddItems() {
         console.log(formData);
         setIsLoading(true);
         try {
-            await axios.post('http://localhost:5021/storeItem', formData);
+            await axios.post(`${api}storeItem`, formData);
             message.success("Item added successfully");
             setItemState(initialItemState);
             setFiles([]);

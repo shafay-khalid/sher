@@ -13,6 +13,7 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const api = 'https://backend-production-6ac7.up.railway.app/'
     
     const [userDetails, setUserDetails] = useState({
         firstName: '',
@@ -26,7 +27,7 @@ const Checkout = () => {
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                const response = await axios.get(`http://localhost:5021/getCartItems/${state.user.uid}`);
+                const response = await axios.get(`${api}getCartItems/${state.user.uid}`);
                 setCartItems(response.data);
             } catch (error) {
                 console.error("Error fetching cart items:", error);
@@ -68,7 +69,7 @@ const Checkout = () => {
         };
 
         try {
-            await axios.post('http://localhost:5021/storeOrder', orderData);
+            await axios.post(`${api}storeOrder`, orderData);
             message.success("Order placed successfully!");
             // Clear input fields
             setUserDetails({

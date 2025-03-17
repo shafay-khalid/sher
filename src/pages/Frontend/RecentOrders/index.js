@@ -8,11 +8,12 @@ export default function RecentOrders() {
     const { state } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const api = 'https://backend-production-6ac7.up.railway.app/'
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`http://localhost:5021/getOrders`);
+                const response = await axios.get(`${api}getOrders`);
                 // Filter orders based on the current user's UID
                 const userOrders = response.data.filter(order => order.userId === state.user.uid);
                 setOrders(userOrders);
@@ -29,7 +30,7 @@ export default function RecentOrders() {
 
     const handleRemoveOrder = async (orderId) => {
         try {
-            await axios.delete(`http://localhost:5021/deleteOrder/${orderId}`);
+            await axios.delete(`${api}deleteOrder/${orderId}`);
             message.success("Order removed successfully!");
             // Update the orders state to remove the canceled order
             setOrders(orders.filter(order => order._id !== orderId));
@@ -60,7 +61,7 @@ export default function RecentOrders() {
                                 <ul>
                                     {order.items.map((item, index) => (
                                         <li key={index} style={styles.itemList}>
-                                            <img src={`http://localhost:5021${item.itemId.imageUrls[0]}`} alt={item.itemId.name} style={styles.itemImage} />
+                                            <img src={`${api}${item.itemId.imageUrls[0]}`} alt={item.itemId.name} style={styles.itemImage} />
                                             <span>
                                                 {item.itemId.name} Color: {item.selectedColor}  Quantity: {item.quantity}<br />
                                                 <span>RS {item.totalPrice.toFixed(2)}</span>

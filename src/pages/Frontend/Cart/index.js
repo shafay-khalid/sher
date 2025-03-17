@@ -14,6 +14,7 @@ const CartPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const api = 'https://backend-production-6ac7.up.railway.app/'
 
   const handleCheckout = () => {
     navigate("/checkout"); // Navigate to the checkout page
@@ -22,7 +23,7 @@ const CartPage = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:5021/getCartItems/${state.user.uid}`);
+        const response = await axios.get(`${api}getCartItems/${state.user.uid}`);
         setCartItems(response.data);
       } catch (err) {
         console.error("Error fetching cart items:", err);
@@ -49,7 +50,7 @@ const CartPage = () => {
 
   const updateQuantity = async (itemId, newQuantity) => {
     try {
-      await axios.put(`http://localhost:5021/updateCartItem/${itemId}`, { quantity: newQuantity });
+      await axios.put(`${api}updateCartItem/${itemId}`, { quantity: newQuantity });
       setCartItems(prevItems => 
         prevItems.map(item => 
           item._id === itemId ? { ...item, quantity: newQuantity } : item
@@ -64,7 +65,7 @@ const CartPage = () => {
 
   const removeItem = async (itemId) => {
     try {
-      await axios.delete(`http://localhost:5021/removeFromCart/${itemId}`);
+      await axios.delete(`${api}removeFromCart/${itemId}`);
       setCartItems(prevItems => prevItems.filter(item => item._id !== itemId));
       message.success("Item removed from cart successfully!");
     } catch (error) {
@@ -80,7 +81,7 @@ const CartPage = () => {
         {cartItems.map(item => (
           <Col key={item._id} xs={24} sm={12} md={8}>
             <Card style={styles.card}>
-              <img src={`http://localhost:5021${item.imageUrl}`} alt={item.itemId.name} style={styles.itemImage} />
+              <img src={`${api}${item.imageUrl}`} alt={item.itemId.name} style={styles.itemImage} />
               <Title level={4}>{item.itemId.name}</Title>
               <Text>Color: {item.selectedColor}</Text>
               <div style={styles.quantityContainer}>

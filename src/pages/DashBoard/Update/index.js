@@ -18,6 +18,7 @@ export default function Update() {
     const [data, setData] = useState([]);
     const [currentItem, setCurrentItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const api = 'https://backend-production-6ac7.up.railway.app/'
 
     const showModal = (item) => {
         setCurrentItem(item);
@@ -54,7 +55,7 @@ export default function Update() {
         };
 
         try {
-            await axios.put(`http://localhost:5021/updateItem/${id}`, formData);
+            await axios.put(`${api}updateItem/${id}`, formData);
             setData(data.map(item => (item._id === id ? { ...item, ...formData } : item)));
             message.success("Item updated successfully");
         } catch (error) {
@@ -65,7 +66,7 @@ export default function Update() {
 
     const deleteItem = async (id) => {
         try {
-            await axios.delete(`http://localhost:5021/deleteItem/${id}`);
+            await axios.delete(`${api}deleteItem/${id}`);
             setData(data.filter(item => item._id !== id));
             message.success("Item deleted successfully");
             setIsModalOpen(false); // Close the modal after deletion
@@ -78,7 +79,7 @@ export default function Update() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:5021/getItems');
+                const response = await axios.get(`${api}/getItems`);
                 setData(response.data);
             } catch (error) {
                 console.error("Error fetching items:", error);

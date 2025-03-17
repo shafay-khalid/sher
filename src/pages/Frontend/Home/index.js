@@ -46,6 +46,7 @@ const HomePage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [items, setItems] = useState([]); // State to hold items
     const categoryRef = useRef(null); // Reference for the category section
+    const api = 'https://backend-production-6ac7.up.railway.app/'
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -59,7 +60,7 @@ const HomePage = () => {
         // Fetch items from the backend
         const fetchItems = async () => {
             try {
-                const response = await axios.get('http://localhost:5021/getItems'); // Adjust the endpoint as needed
+                const response = await axios.get(`${api}getItems`); // Adjust the endpoint as needed
                 setItems(response.data); // Assuming the response contains an array of items
             } catch (error) {
                 console.error("Error fetching items:", error);
@@ -135,14 +136,14 @@ const HomePage = () => {
                             <Link to={`/item/${item._id}`} className="text-decoration-none">
                                 <div className="card shadow-sm">
                                     <img
-                                        src={`http://localhost:5021${item.imageUrls[0]}`}
+                                        src={`${api}${item.imageUrls[0]}`}
                                         alt={item.name}
                                         className="card-img-top img-fluid"
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.src = `http://localhost:5021${item.imageUrls[1]}`;
+                                            e.currentTarget.src = `${api}${item.imageUrls[1]}`;
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.src = `http://localhost:5021${item.imageUrls[0]}`;
+                                            e.currentTarget.src = `${api}${item.imageUrls[0]}`;
                                         }}
                                     />
                                     {/* <div className="card-body text-center">

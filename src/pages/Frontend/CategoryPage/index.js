@@ -10,11 +10,12 @@ const CategoryPage = () => {
     const { categoryName } = useParams(); // Get the category name from the URL
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const api = 'https://backend-production-6ac7.up.railway.app/'
 
     useEffect(() => {
         const fetchCategoryItems = async () => {
             try {
-                const response = await axios.get(`http://localhost:5021/getItemsByCategory/${categoryName}`); // Call the correct endpoint
+                const response = await axios.get(`${api}getItemsByCategory/${categoryName}`); // Call the correct endpoint
                 setItems(response.data);
             } catch (error) {
                 console.error("Error fetching category items:", error);
@@ -38,7 +39,7 @@ const CategoryPage = () => {
                     <Col key={item._id} xs={24} sm={12} md={8}>
                         <Link to={`/item/${item._id}`} style={{ textDecoration: 'none' }}>
                             <Card style={styles.card}>
-                                <img src={`http://localhost:5021${item.imageUrls[0]}`} alt={item.name} style={styles.itemImage} />
+                                <img src={`${api}${item.imageUrls[0]}`} alt={item.name} style={styles.itemImage} />
                                 <div style={styles.itemNameContainer}>
                                     <Title level={4} style={{ color: '#000', margin: 0 }}>{item.name}</Title>
                                 </div>

@@ -17,11 +17,12 @@ const ItemDetails = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [selectedColor, setSelectedColor] = useState(''); // Initialize as empty string
+    const api = 'https://backend-production-6ac7.up.railway.app/'
 
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5021/getItem/${id}`);
+                const response = await axios.get(`${api}getItem/${id}`);
                 setItem(response.data);
                 if (response.data.colors.length > 0) {
                     setSelectedColor(''); // Ensure no color is selected by default
@@ -66,7 +67,7 @@ const ItemDetails = () => {
         };
 
         try {
-            await axios.post('http://localhost:5021/addToCart', cartData);
+            await axios.post(`${api}addToCart`, cartData);
             message.success("Item added to cart successfully!");
         } catch (error) {
             console.error("Error adding item to cart:", error);
@@ -89,7 +90,7 @@ const ItemDetails = () => {
         };
 
         try {
-            await axios.post('http://localhost:5021/addToWishlist', wishlistData);
+            await axios.post(`${api}addToWishlist`, wishlistData);
             message.success("Item added to wishlist successfully!");
         } catch (error) {
             console.error("Error adding item to wishlist:", error);
@@ -120,7 +121,7 @@ const ItemDetails = () => {
                     <Col xs={24} md={12} style={styles.imageContainer}>
                         <LeftOutlined onClick={() => setCurrentImageIndex((currentImageIndex - 1 + item.imageUrls.length) % item.imageUrls.length)} style={{ ...styles.navIcon, left: '10px' }} />
                         <img
-                            src={`http://localhost:5021${item.imageUrls[currentImageIndex]}`}
+                            src={`${api}${item.imageUrls[currentImageIndex]}`}
                             alt={item.name}
                             style={styles.itemImage}
                         />
