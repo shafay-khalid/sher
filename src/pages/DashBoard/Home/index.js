@@ -12,7 +12,7 @@ export default function Home({ searchQuery = '' }) {
 
   const getData = async () => {
     try {
-      const response = await axios.get(`${api}getItems`);
+      const response = await axios.get(`${api}/getItems`);
       setData(response.data);
     } catch (error) {
       console.error("Error fetching menu items: ", error);
@@ -21,7 +21,6 @@ export default function Home({ searchQuery = '' }) {
       setLoading(false);
     }
   };
-  console.log(data)
 
   useEffect(() => {
     getData();
