@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Col, Form, Input, message, Modal, Row, Select, Table } from 'antd';
+import { Button, Card, Form, Input, message, Modal, Table, Select } from 'antd';
 import axios from 'axios';
-import { PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -61,6 +60,18 @@ export default function Update() {
         } catch (error) {
             console.error(error);
             message.error("Failed to update the item.");
+        }
+    };
+
+    const deleteItem = async (id) => {
+        try {
+            await axios.delete(`http://localhost:5021/deleteItem/${id}`);
+            setData(data.filter(item => item._id !== id));
+            message.success("Item deleted successfully");
+            setIsModalOpen(false); // Close the modal after deletion
+        } catch (error) {
+            console.error(error);
+            message.error("Failed to delete the item.");
         }
     };
 
@@ -151,8 +162,11 @@ export default function Update() {
                         <Option value="crossbody">Crossbody</Option>
                         <Option value="fannypacks">Fanny Packs</Option>
                         <Option value="backpacks">Backpacks</Option>
+                        <Option value="jewellery">jewellery</Option>
+                        <Option value="dress">dress</Option>
                     </Select>
                 </Form>
+                <Button type="danger" onClick={() => deleteItem(currentItem._id)}>Delete Item</Button>
             </Modal>
         </>
     );

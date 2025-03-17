@@ -39,7 +39,7 @@ const ItemDetails = () => {
 
     const totalPrice = item ? (item.sellingPrice * quantity).toFixed(2) : 0;
     const discountAmount = item ? (item.sellingPrice * (item.discount / 100)).toFixed(2) : 0; // Calculate discount amount
-    const discountedPrice = item ? (item.sellingPrice - discountAmount).toFixed(2) : 0; // Calculate discounted price
+    const discountedPrice = item ? (item.sellingPrice - discountAmount)*quantity.toFixed(2) : 0; // Calculate discounted price
 
     const addToCart = async () => {
         if (!item) return;
@@ -124,11 +124,12 @@ const ItemDetails = () => {
                     <Col xs={24} md={12} style={styles.detailsContainer}>
                         <Rate allowHalf defaultValue={4} style={{ fontSize: 20, marginBottom: 10 }} />
                         <Title level={3} style={{ color: '#000' }}>{item.name}</Title>
+                        <p>{item.description}</p>
                         <div style={styles.priceContainer}>
                             <Text style={styles.strikethroughPrice}>RS {totalPrice}</Text>
                             <Text style={styles.discountValue}>   {item.discount}% Off</Text>
                         </div>
-                        <Text style={styles.discountedPrice}>Discounted Price: RS {discountedPrice}</Text>
+                        <Text style={styles.discountedPrice}>Limited Offer: RS {discountedPrice}</Text>
 
                         <div style={{ margin: '20px 0' }}>
                             <Text strong>Colors:</Text>

@@ -4,7 +4,7 @@ import { auth } from '../../config/firebase';
 import { useAuth } from '../../context/authContext';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { FaHome, FaCartPlus, FaHeart, FaBox } from 'react-icons/fa';
-import { CoffeeOutlined } from '@ant-design/icons';
+import logo from '../../assets/images/logo2.png'; // Import your logo image
 
 export default function CustomNavbar() {
     const { state } = useAuth();
@@ -38,7 +38,7 @@ export default function CustomNavbar() {
                     left: 0,
                     right: 0,
                     zIndex: 1000,
-                    padding: '15px 0',
+                    padding: '1px 0',
                     boxShadow: scrolled ? '0 2px 15px rgba(0, 0, 0, 0.08)' : 'none'
                 }}
             >
@@ -53,28 +53,30 @@ export default function CustomNavbar() {
                             display: 'flex',
                             alignItems: 'center',
                             transition: 'transform 0.3s ease',
-                            padding: '8px 15px',
+                            padding: '3px 15px',
                             borderRadius: '8px',
                             background: 'transparent',
-                            transform: scrolled ? 'scale(0.95)' : 'scale(1)',
                             marginRight: 'auto' // Align to the left
                         }}
                     >
-                        <CoffeeOutlined
+                        <img
+                            src={logo} // Use the logo image
+                            alt="Logo"
                             style={{
                                 marginRight: '12px',
-                                fontSize: '28px',
-                                color: '#16a34a'
+                                width: '70px', // Set the desired width
+                                height: '70px', // Set the desired height
                             }}
                         />
                         <span
                             style={{
+                                 color: '#22c55e',
                                 background: 'linear-gradient(45deg, #16a34a, #22c55e)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
                             }}
                         >
-                            Crave Curve
+                            Sharki
                         </span>
                     </Navbar.Brand>
 

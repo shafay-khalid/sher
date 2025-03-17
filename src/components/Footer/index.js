@@ -21,8 +21,8 @@ export default function Footer() {
             </p>
             <h5>Social Accounts</h5>
             <p className='mt-2'>
-              <InstagramOutlined style={{ fontSize: '24px', color: '#C13584', marginRight: '10px' }} />
-              <FacebookOutlined style={{ fontSize: '24px', color: '#3b5998' }} />
+              <a > <InstagramOutlined style={{ fontSize: '24px', color: '#C13584', marginRight: '10px' }} /></a>
+              <a href='https://www.facebook.com/profile.php?id=61574013609695'> <FacebookOutlined style={{ fontSize: '24px', color: '#3b5998' }} /></a>
             </p>
           </div>
           <div className="col-12 col-lg-4 col-md-6 col-sm-12">

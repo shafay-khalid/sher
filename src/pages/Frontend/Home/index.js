@@ -1,23 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import bg from "../../../assets/images/bg3.jpg"; // Ensure this path is correct
 import hm from "../../../assets/images/hm.jpg"; // Store image
 import hm2 from "../../../assets/images/hm2.jpg"; // Store image 2
 import hm3 from "../../../assets/images/hm3.jpg"; // Store image 3
-import clutches from "../../../assets/images/clutches.png";
-import shoulderbags from "../../../assets/images/shoulderbags.png";
-import handbags from "../../../assets/images/hansbags.png";
-import totebags from "../../../assets/images/totebags.png";
+import hm4 from "../../../assets/images/hm4.webp";
+import clutches from "../../../assets/images/cltch.jpg";
+import bag from "../../../assets/images/bag.webp";
+import shoulderbags from "../../../assets/images/shlder.avif";
+import handbags from "../../../assets/images/hb.jpg";
+import totebags from "../../../assets/images/tt.webp";
 import pouch from "../../../assets/images/pouch.png";
 import crossbody from "../../../assets/images/crossbody.png";
 import fannypacks from "../../../assets/images/fannypacks.png";
 import backpacks from "../../../assets/images/backpacks.png";
-import eveningbags from "../../../assets/images/eveningbags.png";
+import eveningbags from "../../../assets/images/en.jpg";
+import jwellery from "../../../assets/images/jwellery.jpg";
+import dress from "../../../assets/images/dress.avif";
 import axios from 'axios'; // Import axios for fetching items
 
 // Store images for the main display
 const images = [
     { src: hm, alt: "Store Item 1" },
+    { src: hm4, alt: "Store Item 2" },
     { src: hm2, alt: "Store Item 2" },
     { src: hm3, alt: "Store Item 3" },
 ];
@@ -25,7 +30,9 @@ const images = [
 // Category images for the scrolling section
 const categoryImages = [
     { src: clutches, alt: "Category 1", name: "Clutches", link: "/category/clutches" },
+    { src: jwellery, alt: "Category 2", name: "Jewellery", link: "/category/jewellery" },
     { src: shoulderbags, alt: "Category 3", name: "Shoulder bags", link: "/category/shoulderbags" },
+    { src: dress, alt: "Category 3", name: "Laddies dress", link: "/category/dress" },
     { src: eveningbags, alt: "Category 3", name: "Evening bags", link: "/category/eveningbags" },
     { src: totebags, alt: "Category 3", name: "Tote bags", link: "/category/totebags" },
     { src: pouch, alt: "Category 3", name: "Pouch", link: "/category/pouch" },
@@ -38,6 +45,7 @@ const categoryImages = [
 const HomePage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [items, setItems] = useState([]); // State to hold items
+    const categoryRef = useRef(null); // Reference for the category section
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -64,6 +72,32 @@ const HomePage = () => {
     // Sort items by showingNumber in ascending order
     const sortedItems = items.sort((a, b) => a.showingNumber - b.showingNumber);
 
+    // Automatic scrolling for categories
+    useEffect(() => {
+        const scrollInterval = setInterval(() => {
+            if (categoryRef.current) {
+                const scrollWidth = categoryRef.current.scrollWidth;
+                const clientWidth = categoryRef.current.clientWidth;
+                const scrollLeft = categoryRef.current.scrollLeft;
+
+                if (scrollLeft + clientWidth >= scrollWidth) {
+                    categoryRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    categoryRef.current.scrollBy({ left: 300, behavior: 'smooth' }); // Changed to 315px
+                }
+            }
+        }, 5000); // Change scroll every 3 seconds
+
+        return () => clearInterval(scrollInterval); // Cleanup interval on unmount
+    }, []);
+
+    const handleScroll = (direction) => {
+        if (categoryRef.current) {
+            const scrollAmount = direction === 'left' ? -300 : 300; // Changed to 315px
+            categoryRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
+
     return (
         <div style={styles.homepage}>
             <div style={styles.imageContainer}>
@@ -72,48 +106,64 @@ const HomePage = () => {
                     alt={images[currentImageIndex].alt}
                     style={styles.storeImage}
                 />
-                {/* <div style={styles.saleBanner}>
-                    <h2 style={styles.bannerText}>50% Off on Selected Items!</h2>
-                </div> */}
             </div>
             {/* Horizontal Scrolling Section for Categories */}
             <h2 style={styles.categoriesHeading}>Categories</h2>
-            <div className='scrollSection' style={styles.scrollSection}>
-                {categoryImages.map((category, index) => (
-                    <div key={index} style={styles.scrollItem}>
-                        <Link to={category.link} style={styles.categoryLink}>
-                            <div style={styles.imageWrapper}>
-                                <img src={category.src} alt={category.alt} style={styles.scrollImage} />
-                            </div>
-                            <h3 style={styles.categoryName}>{category.name}</h3> {/* Category Name */}
-                        </Link>
-                    </div>
-                ))}
+            <div style={styles.categoryControls}>
+                <button onClick={() => handleScroll('left')} style={styles.scrollButton}>{"<"}</button>
+                <div className='scrollSection' ref={categoryRef} style={styles.scrollSection}>
+                    {categoryImages.map((category, index) => (
+                        <div key={index} style={styles.scrollItem}>
+                            <Link to={category.link} style={styles.categoryLink}>
+                                <div style={styles.imageWrapper}>
+                                    <img src={category.src} alt={category.alt} style={styles.scrollImage} />
+                                </div>
+                                <h3 style={styles.categoryName}>{category.name}</h3> {/* Category Name */}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+                <button onClick={() => handleScroll('right')} style={styles.scrollButton}>{">"}</button>
             </div>
 
             {/* New Section for All Items */}
-            <h2 style={styles.categoriesHeading}>All Items</h2>
-            <div className='scrollSection' style={styles.scrollSection}>
-                {sortedItems.map((item) => (
-                    <div key={item._id} style={styles.scrollItem}>
-                        <Link to={`/item/${item._id}`}>
-                            <div style={styles.imageWrapper}>
-                                <img
-                                    src={`http://localhost:5021${item.imageUrls[0]}`}
-                                    alt={item.name}
-                                    style={styles.scrollImage}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.src = `http://localhost:5021${item.imageUrls[1]}`;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.src = `http://localhost:5021${item.imageUrls[0]}`;
-                                    }}
-                                />
-                            </div>
-                        </Link>
-                    </div>
-                ))}
+            <div className="container mt-5">
+                <h2 className="text-center text-white">All Items</h2>
+                <div className="row">
+                    {sortedItems.map((item) => (
+                        <div key={item._id} className="col-6 col-md-3 mb-4">
+                            <Link to={`/item/${item._id}`} className="text-decoration-none">
+                                <div className="card shadow-sm">
+                                    <img
+                                        src={`http://localhost:5021${item.imageUrls[0]}`}
+                                        alt={item.name}
+                                        className="card-img-top img-fluid"
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.src = `http://localhost:5021${item.imageUrls[1]}`;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.src = `http://localhost:5021${item.imageUrls[0]}`;
+                                        }}
+                                    />
+                                    {/* <div className="card-body text-center">
+                                        <h5 className="card-title">{item.name}</h5>
+                                    </div> */}
+                                </div>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
             </div>
+
+            {/* WhatsApp Button */}
+            <a
+                href="https://wa.me/923228805282" // Ensure the number is in international format (without +)
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.whatsappButton}
+            >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={styles.whatsappIcon} />
+            </a>
         </div>
     );
 };
@@ -149,32 +199,33 @@ const styles = {
         objectFit: 'cover', // Cover the area
         borderRadius: '8px', // Rounded corners for images
     },
-    saleBanner: {
-        position: 'absolute',
-        bottom: '10%', // Position the banner at the bottom
-        left: '50%',
-        transform: 'translateX(-50%)', // Center the banner
-        backgroundColor: '#ffcc00', // Yellow background for the banner
-        padding: '10px 20px', // Padding for the banner
-        borderRadius: '5px', // Rounded corners
-    },
-    bannerText: {
-        fontSize: '20px', // Font size for the banner text
-        fontWeight: 'bold', // Bold text
-        color: '#000', // Black text color
-    },
     categoriesHeading: {
         margin: '10px 0', // Space above and below the heading
         fontSize: '32px', // Font size for the categories heading
         textAlign: 'center', // Center the heading
         color: "white",
     },
+    categoryControls: {
+        display: 'flex',
+        alignItems: 'center',
+        width: '90%', // Full width
+    },
+    scrollButton: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        color: 'white',
+        fontSize: '24px',
+        cursor: 'pointer',
+        padding: '1px',
+    },
     scrollSection: {
         display: 'flex',
-        overflowX: 'auto', // Allow horizontal scrolling
-        padding: '10px', // Padding for the scroll section
+        alignItems: 'center',
+        overflowX: 'hidden', // Disable horizontal scrolling
+        padding: '1px', // Padding for the scroll section
         width: '100%', // Full width
         backgroundColor: 'transparent', // Slightly transparent background
+        scrollBehavior: 'smooth',
     },
     scrollItem: {
         minWidth: '300px', // Minimum width for each item
@@ -184,27 +235,83 @@ const styles = {
         textAlign: 'center', // Center text
     },
     imageWrapper: {
-        position: 'relative',
-        width: '100%',
-        height: '300px', // Maintain aspect ratio
+        height: '300px'
+    },
+    itemsContainer: {
+        display: 'flex',
+        flexWrap: 'wrap', // Allow items to wrap to the next line
+        justifyContent: 'center', // Center items horizontally
+        width: '90%', // Full width
+        margin: '0 auto', // Center the container
+    },
+    itemWrapper: {
+        width: '50%', // 50% of the total screen width
+        padding: '10px', // Space between items
+        textAlign: 'center', // Center text
+    },
+    imageContainerFixed: {
+        width: '100%', // Full width of the item wrapper
+        height: '270px', // Fixed height
         overflow: 'hidden', // Hide overflow
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '9px'
     },
     scrollImage: {
         width: '100%', // Full width of the item
-        height: '100%', // Maintain aspect ratio
-        borderRadius: '8px', // Rounded corners for images
-        objectFit: "cover",
+        height: '100%', // Full height of the item
+        objectFit: "contain", // Ensure the image is fully visible
         transition: 'transform 0.3s ease', // Smooth transition for hover effect
+        borderRadius: '9px'
     },
     categoryLink: {
         textDecoration: 'none', // Remove underline
-        color: 'white', // Set text color to white
+        color: 'black', // Set text color to black
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light white background
+        padding: '10px', // Add some padding
+        borderRadius: '8px', // Rounded corners
+        display: 'flex', // Use flex to center content
+        flexDirection: 'column', // Stack image and text vertically
+        alignItems: 'center', // Center items horizontally
+        justifyContent: 'center', // Center items vertically
     },
     categoryName: {
         marginTop: '5px', // Space above the category name
         fontSize: '18px', // Font size for the category name
-        color: 'white', // White color for the category name
+        color: 'black', // Black color for the category name
+        fontWeight: 'bold', // Make the text bold
+    },
+    // WhatsApp Button Styles
+    whatsappButton: {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        backgroundColor: '#25D366', // WhatsApp green color
+        borderRadius: '50%',
+        padding: '10px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+        zIndex: 1000, // Ensure it stays on top
+    },
+    whatsappIcon: {
+        width: '50px', // Size of the WhatsApp icon
+        height: '50px',
     },
 };
+
+// Media query for mobile devices
+const mediaQueryStyles = {
+    '@media (max-width: 768px)': {
+        itemsContainer: {
+            flexDirection: 'column', // Stack items vertically on mobile
+        },
+        itemWrapper: {
+            width: '100%', // Full width for each item on mobile
+        },
+    },
+};
+
+// Merge media query styles with main styles
+const combinedStyles = { ...styles, ...mediaQueryStyles };
 
 export default HomePage;

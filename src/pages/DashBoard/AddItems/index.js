@@ -6,7 +6,16 @@ import axios from 'axios';
 const { Title } = Typography;
 const { Option } = Select;
 
-const initialItemState = { name: "", buyPrice: "", sellingPrice: "", discount: "", showingNumber: "", categories: [], images: [] };
+const initialItemState = { 
+    name: "", 
+    buyPrice: "", 
+    sellingPrice: "", 
+    discount: "", 
+    showingNumber: "", 
+    categories: [], 
+    description: "", // Add description to the initial state
+    images: [] 
+};
 
 // Define the categories you want to allow
 const availableCategories = [
@@ -18,7 +27,9 @@ const availableCategories = [
     "handbags",
     "crossbody",
     "fannypacks",
-    "backpacks"
+    "backpacks",
+    'jewellery',
+    'dress'
 ];
 
 export default function AddItems() {
@@ -47,17 +58,16 @@ export default function AddItems() {
 
     const handleSubmitItem = async (e) => {
         e.preventDefault();
-        const { name, buyPrice, sellingPrice, discount, showingNumber, categories } = itemState;
-
+        const { name, buyPrice, sellingPrice, discount, showingNumber, categories, description } = itemState;
+    
         if (name.length < 3) return message.error("Please enter a proper item name");
         if (categories.length === 0) return message.error("Please select at least one category");
         if (buyPrice <= 0) return message.error("Please enter a valid buy price");
         if (sellingPrice <= 0) return message.error("Please enter a valid selling price");
-        if (files.length !== colors.length) return message.error("Please provide a color for each image");
-
+    
         const id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
         let imageUrls = [];
-
+    
         // Upload images to the backend
         if (files.length > 0) {
             setIsLoading(true);
@@ -66,13 +76,13 @@ export default function AddItems() {
                 files.forEach(file => {
                     formData.append('images', file.originFileObj);
                 });
-
+    
                 const response = await axios.post('http://localhost:5021/uploadImages', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-
+    
                 imageUrls = response.data.imageUrls; // Assuming your backend returns the URLs of the uploaded images
             } catch (error) {
                 console.error("Image upload error:", error);
@@ -81,8 +91,19 @@ export default function AddItems() {
                 return;
             }
         }
-
-        const formData = { name, buyPrice, sellingPrice, discount, showingNumber, categories, id, imageUrls, colors };
+    
+        const formData = { 
+            name, 
+            buyPrice, 
+            sellingPrice, 
+            discount, 
+            showingNumber, 
+            categories, 
+            id, 
+            imageUrls, 
+            colors: colors.length ? colors : [""] , // Set colors to an array with an empty string if no colors are provided
+            description // Include description in the form data
+        };
         console.log(formData);
         setIsLoading(true);
         try {
@@ -121,6 +142,15 @@ export default function AddItems() {
                         </Col>
                         <Col span={24}>
                             <Input type='number' placeholder='Showing Number' name='showingNumber' onChange={handleChange} value={itemState.showingNumber} />
+                        </Col>
+                        <Col span={24}>
+                            <Input.TextArea 
+                                placeholder='Description' 
+                                name='description' 
+                                onChange={handleChange} 
+                                value={itemState.description} 
+                                rows={4} 
+                            />
                         </Col>
                         <Col span={24}>
                             <Select
