@@ -13,7 +13,7 @@ const Wishlist = () => {
     const navigate = useNavigate();
     const [wishlistItems, setWishlistItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const api = 'https://backend-production-6ac7.up.railway.app/'
+    const api = 'https://backend-production-6ac7.up.railway.app'
 
     useEffect(() => {
         if (!state.isAuthenticated) {
@@ -24,7 +24,7 @@ const Wishlist = () => {
 
         const fetchWishlistItems = async () => {
             try {
-                const response = await axios.get(`${api}getWishlistItems/${state.user.uid}`);
+                const response = await axios.get(`${api}/getWishlistItems/${state.user.uid}`);
                 setWishlistItems(response.data);
             } catch (error) {
                 console.error("Error fetching wishlist items:", error);
@@ -39,7 +39,7 @@ const Wishlist = () => {
 
     const removeFromWishlist = async (itemId) => {
         try {
-            await axios.delete(`${api}removeFromWishlist/${itemId}`);
+            await axios.delete(`${api}/removeFromWishlist/${itemId}`);
             setWishlistItems(wishlistItems.filter(item => item.itemId && item.itemId._id !== itemId)); // Ensure you're checking against the correct ID
             message.success("Item removed from wishlist successfully!");
         } catch (error) {

@@ -8,7 +8,7 @@ const { Title, Paragraph } = Typography;
 export default function Home({ searchQuery = '' }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const api = 'https://backend-production-6ac7.up.railway.app/'
+  const api = 'https://backend-production-6ac7.up.railway.app'
 
   const getData = async () => {
     try {
@@ -21,6 +21,7 @@ export default function Home({ searchQuery = '' }) {
       setLoading(false);
     }
   };
+  console.log(data)
 
   useEffect(() => {
     getData();

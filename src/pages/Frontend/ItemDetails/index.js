@@ -17,12 +17,12 @@ const ItemDetails = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [selectedColor, setSelectedColor] = useState(''); // Initialize as empty string
-    const api = 'https://backend-production-6ac7.up.railway.app/'
+    const api = 'https://backend-production-6ac7.up.railway.app'
 
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`${api}getItem/${id}`);
+                const response = await axios.get(`${api}/getItem/${id}`);
                 setItem(response.data);
                 if (response.data.colors.length > 0) {
                     setSelectedColor(''); // Ensure no color is selected by default
@@ -67,7 +67,7 @@ const ItemDetails = () => {
         };
 
         try {
-            await axios.post(`${api}addToCart`, cartData);
+            await axios.post(`${api}//addToCart`, cartData);
             message.success("Item added to cart successfully!");
         } catch (error) {
             console.error("Error adding item to cart:", error);
@@ -90,7 +90,7 @@ const ItemDetails = () => {
         };
 
         try {
-            await axios.post(`${api}addToWishlist`, wishlistData);
+            await axios.post(`${api}/addToWishlist`, wishlistData);
             message.success("Item added to wishlist successfully!");
         } catch (error) {
             console.error("Error adding item to wishlist:", error);

@@ -10,12 +10,12 @@ const CategoryPage = () => {
     const { categoryName } = useParams(); // Get the category name from the URL
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const api = 'https://backend-production-6ac7.up.railway.app/'
+    const api = 'https://backend-production-6ac7.up.railway.app'
 
     useEffect(() => {
         const fetchCategoryItems = async () => {
             try {
-                const response = await axios.get(`${api}getItemsByCategory/${categoryName}`); // Call the correct endpoint
+                const response = await axios.get(`${api}/getItemsByCategory/${categoryName}`); // Call the correct endpoint
                 setItems(response.data);
             } catch (error) {
                 console.error("Error fetching category items:", error);

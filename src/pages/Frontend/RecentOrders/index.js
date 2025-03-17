@@ -8,12 +8,12 @@ export default function RecentOrders() {
     const { state } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const api = 'https://backend-production-6ac7.up.railway.app/'
+    const api = 'https://backend-production-6ac7.up.railway.app'
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${api}getOrders`);
+                const response = await axios.get(`${api}/getOrders`);
                 // Filter orders based on the current user's UID
                 const userOrders = response.data.filter(order => order.userId === state.user.uid);
                 setOrders(userOrders);
@@ -30,7 +30,7 @@ export default function RecentOrders() {
 
     const handleRemoveOrder = async (orderId) => {
         try {
-            await axios.delete(`${api}deleteOrder/${orderId}`);
+            await axios.delete(`${api}/deleteOrder/${orderId}`);
             message.success("Order removed successfully!");
             // Update the orders state to remove the canceled order
             setOrders(orders.filter(order => order._id !== orderId));

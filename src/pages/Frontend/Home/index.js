@@ -46,7 +46,7 @@ const HomePage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [items, setItems] = useState([]); // State to hold items
     const categoryRef = useRef(null); // Reference for the category section
-    const api = 'https://backend-production-6ac7.up.railway.app/'
+    const api = 'https://backend-production-6ac7.up.railway.app'
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -60,7 +60,7 @@ const HomePage = () => {
         // Fetch items from the backend
         const fetchItems = async () => {
             try {
-                const response = await axios.get(`${api}getItems`); // Adjust the endpoint as needed
+                const response = await axios.get(`${api}/getItems`); // Adjust the endpoint as needed
                 setItems(response.data); // Assuming the response contains an array of items
             } catch (error) {
                 console.error("Error fetching items:", error);
@@ -158,7 +158,7 @@ const HomePage = () => {
 
             {/* WhatsApp Button */}
             <a
-                href="https://wa.me/923228805282" // Ensure the number is in international format (without +)
+                href="https://wa.me/923477075533" // Ensure the number is in international format (without +)
                 target="_blank"
                 rel="noopener noreferrer"
                 style={styles.whatsappButton}
