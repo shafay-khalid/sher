@@ -158,7 +158,7 @@ const HomePage = () => {
 
             {/* WhatsApp Button */}
             <a
-                href="https://wa.me/923477075533" // Ensure the number is in international format (without +)
+                href="https://wa.me/923477065533" // Ensure the number is in international format (without +)
                 target="_blank"
                 rel="noopener noreferrer"
                 style={styles.whatsappButton}
