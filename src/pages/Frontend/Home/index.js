@@ -131,24 +131,23 @@ const HomePage = () => {
             <div className="container mt-5">
                 <h2 className="text-center text-white">All Items</h2>
                 <div className="row mt-4">
-                    {sortedItems.map((item) => (
+                    {items.map((item) => (
                         <div key={item._id} className="col-6 col-md-3 mb-4">
                             <Link to={`/item/${item._id}`} className="text-decoration-none">
                                 <div className="card shadow-sm">
-                                    <img
-                                        src={`${api}${item.imageUrls[0]}`}
-                                        alt={item.name}
-                                        className="card-img-top img-fluid"
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.src = `${api}${item.imageUrls[1]}`;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.src = `${api}${item.imageUrls[0]}`;
-                                        }}
-                                    />
-                                    {/* <div className="card-body text-center">
-                                        <h5 className="card-title">{item.name}</h5>
-                                    </div> */}
+                                    <div>
+                                        <img
+                                            src={`${api}${item.imageUrls[0]}`}
+                                            alt={item.name}
+                                            className="card-img-top img-fluid"
+                                            style={styles.itemImage}
+                                        />
+                                        {item.discount > 0 && (
+                                            <div style={styles.discountOverlay}>
+                                                <span style={styles.discountText}>{item.discount}% OFF</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </Link>
                         </div>
@@ -282,6 +281,26 @@ const styles = {
         fontSize: '18px', // Font size for the category name
         color: 'black', // Black color for the category name
         fontWeight: 'bold', // Make the text bold
+    },
+    itemImage: {
+        width: '100%',
+        height: 'auto',
+        position: 'relative',
+        overflow: 'hidden',
+        // objectFit: 'cover',
+    },
+    discountOverlay: {
+        position: 'absolute',
+        top: '10px',
+        left: '10px',
+        backgroundColor: '#16a34a', 
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontWeight: 'bold',
+    },
+    discountText: {
+        fontSize: '16px',
     },
     // WhatsApp Button Styles
     whatsappButton: {
