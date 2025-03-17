@@ -16,8 +16,9 @@ const ItemDetails = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState(''); // Initialize as empty string
-    const api = 'https://backend-production-6ac7.up.railway.app'
+    const [selectedColor, setSelectedColor] = useState('');
+    const [isInWishlist, setIsInWishlist] = useState(false); // State to track if item is in wishlist
+    const api = 'https://backend-production-6ac7.up.railway.app';
 
     useEffect(() => {
         const fetchItemDetails = async () => {
@@ -25,8 +26,12 @@ const ItemDetails = () => {
                 const response = await axios.get(`${api}/getItem/${id}`);
                 setItem(response.data);
                 if (response.data.colors.length > 0) {
-                    setSelectedColor(''); // Ensure no color is selected by default
+                    setSelectedColor('');
                 }
+                // Check if the item is already in the wishlist
+                const wishlistResponse = await axios.get(`${api}/getWishlistItems/${state.user.uid}`);
+                const isItemInWishlist = wishlistResponse.data.some(wishlistItem => wishlistItem.itemId._id === id);
+                setIsInWishlist(isItemInWishlist);
             } catch (error) {
                 console.error("Error fetching item details:", error);
                 message.error("Failed to fetch item details");
@@ -36,11 +41,11 @@ const ItemDetails = () => {
         };
 
         fetchItemDetails();
-    }, [id]);
+    }, [id, state.user.uid]);
 
     const totalPrice = item ? (item.sellingPrice * quantity).toFixed(2) : 0;
-    const discountAmount = item ? (item.sellingPrice * (item.discount / 100)).toFixed(2) : 0; // Calculate discount amount
-    const discountedPrice = item ? (item.sellingPrice - discountAmount) * quantity.toFixed(2) : 0; // Calculate discounted price
+    const discountAmount = item ? (item.sellingPrice * (item.discount / 100)).toFixed(2) : 0;
+    const discountedPrice = item ? (item.sellingPrice - discountAmount) * quantity : 0;
 
     const addToCart = async () => {
         if (!item) return;
@@ -52,22 +57,22 @@ const ItemDetails = () => {
         }
 
         if (!selectedColor) {
-            message.error("Please select a color before adding to cart."); // Show error message
+            message.error("Please select a color before adding to cart.");
             return;
         }
 
         const cartData = {
             itemId: item._id,
             quantity,
-            totalPrice: discountedPrice, // Store the discounted price
+            totalPrice: discountedPrice,
             profit: (item.sellingPrice - item.buyPrice).toFixed(2),
             userId: state.user.uid,
             selectedColor,
-            imageUrl: item.imageUrls[currentImageIndex] // Pass the selected image URL
+            imageUrl: item.imageUrls[currentImageIndex]
         };
 
         try {
-            await axios.post(`${api}//addToCart`, cartData);
+            await axios.post(`${api}/addToCart`, cartData);
             message.success("Item added to cart successfully!");
         } catch (error) {
             console.error("Error adding item to cart:", error);
@@ -75,7 +80,7 @@ const ItemDetails = () => {
         }
     };
 
-    const addToWishlist = async () => {
+    const toggleWishlist = async () => {
         if (!item) return;
 
         if (!state.isAuthenticated) {
@@ -90,12 +95,29 @@ const ItemDetails = () => {
         };
 
         try {
-            await axios.post(`${api}/addToWishlist`, wishlistData);
-            message.success("Item added to wishlist successfully!");
+            if (isInWishlist) {
+                // Remove from wishlist
+                await axios.delete(`${api}/removeFromWishlist/${item._id}`);
+                setIsInWishlist(false);
+                message.success("Item removed from wishlist successfully!");
+            } else {
+                // Add to wishlist
+                await axios.post(`${api}/addToWishlist`, wishlistData);
+                setIsInWishlist(true);
+                message.success("Item added to wishlist successfully!");
+            }
         } catch (error) {
-            console.error("Error adding item to wishlist:", error);
-            message.error("Failed to add item to wishlist");
+            console.error("Error toggling wishlist:", error);
+            message.error("Failed to toggle wishlist ");
         }
+    };
+
+    const handleColorChange = (color) => {
+        const colorIndex = item.colors.indexOf(color);
+        if (colorIndex !== -1) {
+            setCurrentImageIndex(colorIndex);
+        }
+        setSelectedColor(color);
     };
 
     if (isLoading) {
@@ -105,14 +127,6 @@ const ItemDetails = () => {
     if (!item) {
         return <div>Item not found</div>;
     }
-
-    const handleColorChange = (color) => {
-        const colorIndex = item.colors.indexOf(color);
-        if (colorIndex !== -1) {
-            setCurrentImageIndex(colorIndex); // Assuming the images are in the same order as colors
-        }
-        setSelectedColor(color);
-    };
 
     return (
         <>
@@ -142,7 +156,7 @@ const ItemDetails = () => {
                             <Select
                                 style={{ width: '200px', marginLeft: '10px' }}
                                 onChange={handleColorChange}
-                                value={selectedColor || undefined} // Set to undefined if no color is selected
+                                value={selectedColor || undefined}
                             >
                                 {item.colors.map((color, index) => (
                                     <Select.Option key={index} value={color}>
@@ -162,7 +176,14 @@ const ItemDetails = () => {
                         </div>
 
                         <div style={styles.buttonContainer}>
-                            <Button type="default" icon={<HeartOutlined />} className="iconButton" onClick={addToWishlist}>Add to Favorites</Button>
+                            <Button 
+                                type="default" 
+                                icon={<HeartOutlined style={{ color: isInWishlist ? 'red' : 'inherit' }} />} 
+                                className="iconButton" 
+                                onClick={toggleWishlist}
+                            >
+                                {isInWishlist ? 'Remove from Favorites' : 'Add to Favorites'}
+                            </Button>
                             <Button type="primary" icon={<ShoppingCartOutlined />} style={{ backgroundColor: '#16a34a' }} className="cartButton" onClick={addToCart}>Add to Cart</Button>
                         </div>
                     </Col>
@@ -207,7 +228,7 @@ const styles = {
         transform: 'translateY(-50%)',
         fontSize: '24px',
         cursor: 'pointer',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+ backgroundColor: 'rgba(0, 0, 0, 0.5)',
         color: '#fff',
         padding: '10px',
         borderRadius: '50%',
@@ -226,18 +247,18 @@ const styles = {
     strikethroughPrice: {
         fontSize: '22px',
         fontWeight: 'bold',
-        color: '#ff0000', // Red color for strikethrough
+        color: '#ff0000',
         textDecoration: 'line-through',
         marginRight: '10px',
     },
     discountValue: {
         fontSize: '20px',
-        color: '#ff0000', // Red color for discount value
+        color: '#ff0000',
     },
     discountedPrice: {
         fontSize: '22px',
         fontWeight: 'bold',
-        color: '#16a34a', // Green color for discounted price
+        color: '#16a34a',
         marginTop: '10px',
     },
     buttonContainer: {
