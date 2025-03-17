@@ -83,7 +83,7 @@ const HomePage = () => {
                 if (scrollLeft + clientWidth >= scrollWidth) {
                     categoryRef.current.scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
-                    categoryRef.current.scrollBy({ left: 300, behavior: 'smooth' }); // Changed to 315px
+                    categoryRef.current.scrollBy({ left: 310, behavior: 'smooth' }); // Changed to 315px
                 }
             }
         }, 5000); // Change scroll every 3 seconds
@@ -93,7 +93,7 @@ const HomePage = () => {
 
     const handleScroll = (direction) => {
         if (categoryRef.current) {
-            const scrollAmount = direction === 'left' ? -300 : 300; // Changed to 315px
+            const scrollAmount = direction === 'left' ? -310 : 310; // Changed to 315px
             categoryRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
