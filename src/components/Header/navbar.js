@@ -2,21 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { useAuth } from '../../context/authContext';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container, Badge } from 'react-bootstrap';
 import { FaHome, FaCartPlus, FaHeart, FaBox } from 'react-icons/fa';
 import logo from '../../assets/images/logo2.png'; // Import your logo image
+import axios from 'axios';
 
 export default function CustomNavbar() {
     const { state } = useAuth();
     const navigate = useNavigate();
-    const navbarRef = useRef(null); // Create a ref for the navbar
+    const navbarRef = useRef(null);
+    const [cartItemCount, setCartItemCount] = useState(0);
+    const [scrolled, setScrolled] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     const doSignOut = () => {
         return auth.signOut();
     };
-
-    const [scrolled, setScrolled] = useState(false);
-    const [isOpen, setIsOpen] = useState(false); // State to manage navbar toggle
 
     useEffect(() => {
         const handleScroll = () => {
@@ -26,11 +27,10 @@ export default function CustomNavbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Handle clicks outside the navbar
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-                setIsOpen(false); // Close the navbar if clicked outside
+                setIsOpen(false);
             }
         };
 
@@ -40,13 +40,36 @@ export default function CustomNavbar() {
         };
     }, []);
 
+    // Fetch cart item count
+    const fetchCartItemCount = async () => {
+        if (state.isAuthenticated) {
+            try {
+                const response = await axios.get(`https://backend-production-6ac7.up.railway.app/getCartItems/${state.user.uid}`);
+                setCartItemCount(response.data.length);
+            } catch (error) {
+                console.error("Error fetching cart items:", error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        // Fetch cart item count immediately on mount
+        fetchCartItemCount();
+
+        // Set up interval to fetch cart item count every 2 seconds
+        const intervalId = setInterval(fetchCartItemCount, 2000);
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
+    }, [state.isAuthenticated, state.user.uid]); // Dependencies to re-fetch when user state changes
+
     return (
         <header>
             <Navbar
-                ref={navbarRef} // Attach the ref to the Navbar
+                ref={navbarRef}
                 expand="lg"
                 style={{
-                    background: 'linear-gradient(135deg, #000000, #16a34a)', // Black to dark green gradient
+                    background: 'linear-gradient(135deg, #000000, #16a34a)',
                     backdropFilter: 'blur(10px)',
                     borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
                     transition: 'all 0.3s ease',
@@ -73,16 +96,16 @@ export default function CustomNavbar() {
                             padding: '8px 15px',
                             borderRadius: '8px',
                             background: 'transparent',
-                            marginRight: 'auto' // Align to the left
+                            marginRight: 'auto'
                         }}
                     >
                         <img
-                            src={logo} // Use the logo image
+                            src={logo}
                             alt="Logo"
                             style={{
                                 marginRight: '12px',
-                                width: '70px', // Set the desired width
-                                height: '70px', // Set the desired height
+                                width: '70px',
+                                height: '70px',
                             }}
                         />
                         <span
@@ -99,52 +122,57 @@ export default function CustomNavbar() {
 
                     <Navbar.Toggle 
                         aria-controls="basic-navbar-nav" 
-                        onClick={() => setIsOpen(!isOpen)} // Toggle the navbar open state
+                        onClick={() => setIsOpen(!isOpen)} 
                     />
 
                     <Navbar.Collapse id="basic-navbar-nav" in={isOpen}>
                         <Nav className="me-auto" style={{ justifyContent: 'center', flexGrow: 1 }}>
                             <Nav.Link as={Link} to="/" style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }} 
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                    e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                    e.currentTarget.style.color = '#e0e0e0'; 
+                                    e.currentTarget.style.fontSize = '18px'; 
                                 }} 
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#ffffff'; // Reset color
-                                    e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                    e.currentTarget.style.color = '#ffffff'; 
+                                    e.currentTarget.style.fontSize = '16px'; 
                                 }}>
                                 <FaHome /> Home
                             </Nav.Link>
                             <Nav.Link as={Link} to="/cart" style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }} 
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                    e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                    e.currentTarget.style.color = '#e0e0e0'; 
+                                    e.currentTarget.style.fontSize = '18px'; 
                                 }} 
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#ffffff'; // Reset color
-                                    e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                    e.currentTarget.style.color = '#ffffff'; 
+                                    e.currentTarget.style.fontSize = '16px'; 
                                 }}>
-                                <FaCartPlus /> Cart
+                                <FaCartPlus /> Cart 
+                                {cartItemCount > 0 && (
+                                    <Badge pill bg="danger" style={{ marginLeft: '5px' }}>
+                                        {cartItemCount}
+                                    </Badge>
+                                )}
                             </Nav.Link>
                             <Nav.Link as={Link} to="/wishlist" style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }} 
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                    e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                    e.currentTarget.style.color = '#e0e0e0'; 
+                                    e.currentTarget.style.fontSize = '18px'; 
                                 }} 
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#ffffff'; // Reset color
-                                    e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                    e.currentTarget.style.color = '#ffffff'; 
+                                    e.currentTarget.style.fontSize = '16px'; 
                                 }}>
                                 <FaHeart /> WishList
                             </Nav.Link>
                             <Nav.Link as={Link} to="/orders" style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }} 
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                    e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                    e.currentTarget.style.color = '#e0e0e0'; 
+                                    e.currentTarget.style.fontSize = '18px'; 
                                 }} 
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#ffffff'; // Reset color
-                                    e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                    e.currentTarget.style.color = '#ffffff'; 
+                                    e.currentTarget.style.fontSize = '16px'; 
                                 }}>
                                 <FaBox /> My Orders
                             </Nav.Link>
@@ -160,14 +188,14 @@ export default function CustomNavbar() {
                                     }}
                                     className='btn btn-light mx-1' style={{ backgroundColor: 'transparent', border: '1px solid #ffffff', color: '#ffffff', transition: 'background-color 0.3s, color 0.3s, transform 0.3s' }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#dc3545'; // Change background on hover
-                                        e.currentTarget.style.color = '#ffffff'; // Change text color on hover
-                                        e.currentTarget.style.transform = 'scale(1.05)'; // Slightly zoom in
+                                        e.currentTarget.style.backgroundColor = '#dc3545'; 
+                                        e.currentTarget.style.color = '#ffffff'; 
+                                        e.currentTarget.style.transform = 'scale(1.05)'; 
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent'; // Reset background
-                                        e.currentTarget.style.color = '#ffffff'; // Reset text color
-                                        e.currentTarget.style.transform = 'scale(1)'; // Reset zoom
+                                        e.currentTarget.style.backgroundColor = 'transparent'; 
+                                        e.currentTarget.style.color = '#ffffff'; 
+                                        e.currentTarget.style.transform = 'scale(1)'; 
                                     }}
                                 >
                                     Logout
@@ -178,12 +206,12 @@ export default function CustomNavbar() {
                                         <Link className='text-sm text-decoration-none' to={'/auth/login'} 
                                             style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }}
                                             onMouseEnter={(e) => {
-                                                e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                                e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                                e.currentTarget.style.color = '#e0e0e0'; 
+                                                e.currentTarget.style.fontSize = '18px'; 
                                             }} 
                                             onMouseLeave={(e) => {
-                                                e.currentTarget.style.color = '#ffffff'; // Reset color
-                                                e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                                e.currentTarget.style.color = '#ffffff'; 
+                                                e.currentTarget.style.fontSize = '16px'; 
                                             }}>
                                             Login
                                         </Link>
@@ -192,12 +220,12 @@ export default function CustomNavbar() {
                                         <Link className='text-sm text-decoration-none' to={'/auth/register'} 
                                             style={{ color: '#ffffff', transition: 'color 0.3s ease, font-size 0.3s ease' }}
                                             onMouseEnter={(e) => {
-                                                e.currentTarget.style.color = '#e0e0e0'; // Change color on hover
-                                                e.currentTarget.style.fontSize = '18px'; // Increase font size on hover
+                                                e.currentTarget.style.color = '#e0e0e0'; 
+                                                e.currentTarget.style.fontSize = '18px'; 
                                             }} 
                                             onMouseLeave={(e) => {
-                                                e.currentTarget.style.color = '#ffffff'; // Reset color
-                                                e.currentTarget.style.fontSize = '16px'; // Reset font size
+                                                e.currentTarget.style.color = '#ffffff'; 
+                                                e.currentTarget.style.fontSize = '16px'; 
                                             }}>
                                             Register New Account
                                         </Link>

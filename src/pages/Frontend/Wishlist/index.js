@@ -18,7 +18,7 @@ const Wishlist = () => {
     useEffect(() => {
         if (!state.isAuthenticated) {
             message.warning("You need to log in to view your wishlist.");
-            navigate('/login');
+            navigate('/auth/login');
             return;
         }
 

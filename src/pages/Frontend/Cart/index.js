@@ -21,6 +21,11 @@ const CartPage = () => {
   };
 
   useEffect(() => {
+    if (!state.isAuthenticated) {
+      message.warning("You need to log in to view your cart.");
+      navigate('/auth/login');
+      return;
+    }
     const fetchCartItems = async () => {
       try {
         const response = await axios.get(`${api}/getCartItems/${state.user.uid}`);
@@ -34,7 +39,7 @@ const CartPage = () => {
     };
 
     fetchCartItems();
-  }, [state.user.uid]);
+  }, [state.isAuthenticated, state.user.uid, navigate]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -51,8 +56,8 @@ const CartPage = () => {
   const updateQuantity = async (itemId, newQuantity) => {
     try {
       await axios.put(`${api}/updateCartItem/${itemId}`, { quantity: newQuantity });
-      setCartItems(prevItems => 
-        prevItems.map(item => 
+      setCartItems(prevItems =>
+        prevItems.map(item =>
           item._id === itemId ? { ...item, quantity: newQuantity } : item
         )
       );
@@ -88,11 +93,11 @@ const CartPage = () => {
                 <Button onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))}>-</Button>
                 <Text style={{ margin: '0 10px' }}>{item.quantity}</Text>
                 <Button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</Button>
-                <Button 
-                  type="text" 
-                  icon={<DeleteOutlined />} 
-                  onClick={() => removeItem(item._id)} 
-                  style={{ marginLeft: '10px', color: 'red' }} 
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => removeItem(item._id)}
+                  style={{ marginLeft: '10px', color: 'red' }}
                 />
               </div>
               <Text strong style={styles.price}>Total: RS {(item.totalPrice * item.quantity).toFixed(2)}</Text>
@@ -101,7 +106,7 @@ const CartPage = () => {
         ))}
       </Row>
       <div style={styles.totalContainer}>
-        <Text style={{ fontSize: "18px", color: "#fff" }}>Grand Total: RS {calculateTotal()}</Text><br/>
+        <Text style={{ fontSize: "18px", color: "#fff" }}>Grand Total: RS {calculateTotal()}</Text><br />
         <Button type="primary" style={styles.checkoutButton} onClick={handleCheckout}>Check out</Button>
       </div>
     </div>

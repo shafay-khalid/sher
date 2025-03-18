@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { FaShoppingCart } from 'react-icons/fa'; // Import the cart icon
 import bg from "../../../assets/images/bg3.jpg"; // Ensure this path is correct
 import hm from "../../../assets/images/hm.jpg"; // Store image
 import hm2 from "../../../assets/images/hm2.jpg"; // Store image 2
@@ -18,6 +19,7 @@ import eveningbags from "../../../assets/images/en.jpg";
 import jwellery from "../../../assets/images/jwellery.jpg";
 import dress from "../../../assets/images/dress.avif";
 import axios from 'axios'; // Import axios for fetching items
+import { useAuth } from '../../../context/authContext';
 
 // Store images for the main display
 const images = [
@@ -43,10 +45,13 @@ const categoryImages = [
 ];
 
 const HomePage = () => {
+    const { state } = useAuth();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [items, setItems] = useState([]); // State to hold items
+    const [loading, setLoading] = useState(true); // State to track loading status
+    const [cartItemCount, setCartItemCount] = useState(0); // State for cart item count
     const categoryRef = useRef(null); // Reference for the category section
-    const api = 'https://backend-production-6ac7.up.railway.app'
+    const api = 'https://backend-production-6ac7.up.railway.app';
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -55,6 +60,7 @@ const HomePage = () => {
 
         return () => clearInterval(interval); // Cleanup interval on unmount
     }, []);
+
 
     useEffect(() => {
         // Fetch items from the backend
@@ -72,6 +78,29 @@ const HomePage = () => {
 
     // Sort items by showingNumber in ascending order
     const sortedItems = items.sort((a, b) => a.showingNumber - b.showingNumber);
+
+    // Fetch cart item count
+    const fetchCartItemCount = async () => {
+        if (state.isAuthenticated) {
+            try {
+                const response = await axios.get(`https://backend-production-6ac7.up.railway.app/getCartItems/${state.user.uid}`);
+                setCartItemCount(response.data.length);
+            } catch (error) {
+                console.error("Error fetching cart items:", error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        // Fetch cart item count immediately on mount
+        fetchCartItemCount();
+
+        // Set up interval to fetch cart item count every 2 seconds
+        const intervalId = setInterval(fetchCartItemCount, 2000);
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
+    }, [state.isAuthenticated, state.user.uid]); // Dependencies to re-fetch when user state changes
 
     // Automatic scrolling for categories
     useEffect(() => {
@@ -135,7 +164,7 @@ const HomePage = () => {
                         <div key={item._id} className="col-6 col-md-3 mb-4">
                             <Link to={`/item/${item._id}`} className="text-decoration-none">
                                 <div className="card shadow-sm">
-                                    <div>
+                                    <div style={{ minHeight: '200px' }}>
                                         <img
                                             src={`${api}${item.imageUrls[0]}`}
                                             alt={item.name}
@@ -154,7 +183,6 @@ const HomePage = () => {
                     ))}
                 </div>
             </div>
-
             {/* WhatsApp Button */}
             <a
                 href="https://wa.me/923477065533" // Ensure the number is in international format (without +)
@@ -164,6 +192,14 @@ const HomePage = () => {
             >
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={styles.whatsappIcon} />
             </a>
+
+            {/* Cart Button */}
+            <Link to="/cart" style={styles.cartButton}>
+                <FaShoppingCart style={styles.cartIcon} />
+                {cartItemCount > 0 && (
+                    <span style={styles.cartItemCount}>{cartItemCount}</span>
+                )}
+            </Link>
         </div>
     );
 };
@@ -208,15 +244,18 @@ const styles = {
     categoryControls: {
         display: 'flex',
         alignItems: 'center',
-        width: '90%', // Full width
+        width: '100%', // Full width
     },
     scrollButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Transparent white background
         border: 'none',
-        color: 'white',
+        color: 'black',
         fontSize: '24px',
         cursor: 'pointer',
-        padding: '1px',
+        padding: '10px',
+        fontWeight: 'bold', // Make the button text bold
+        borderRadius: '5px', // Rounded corners for buttons
+        margin: '0 5px', // Space between buttons
     },
     scrollSection: {
         display: 'flex',
@@ -293,7 +332,7 @@ const styles = {
         position: 'absolute',
         top: '10px',
         left: '10px',
-        backgroundColor: '#16a34a', 
+        backgroundColor: '#16a34a',
         color: 'white',
         padding: '5px 10px',
         borderRadius: '5px',
@@ -314,8 +353,38 @@ const styles = {
         zIndex: 1000, // Ensure it stays on top
     },
     whatsappIcon: {
-        width: '50px', // Size of the WhatsApp icon
-        height: '50px',
+        width: '45px', // Size of the WhatsApp icon
+        height: '45px',
+    },
+    // Cart Button Styles
+    cartButton: {
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        backgroundColor: '#25D366',
+        borderRadius: '50%',
+        padding: '10px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+        zIndex: 1000, // Ensure it stays on top
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cartIcon: {
+        fontSize: '45px', // Size of the cart icon
+        color: '#ffffff',
+    },
+    cartItemCount: {
+        position: 'absolute',
+        top: '-5px',
+        right: '-5px',
+        backgroundColor: 'red',
+        color: 'white',
+        borderRadius: '50%',
+        padding: '2px 5px',
+        fontSize: '12px',
+        minWidth: '20px', // Ensure the badge has a minimum width
+        textAlign: 'center', // Center the text in the badge
     },
 };
 
