@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Typography, message, Row, Col, Rate, Select } from 'antd';
 import axios from 'axios';
-import { HeartOutlined, ShoppingCartOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { HeartOutlined, LeftOutlined, RightOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import bg from "../../../assets/images/bg3.jpg";
 import { useAuth } from '../../../context/authContext';
 
@@ -17,7 +17,9 @@ const ItemDetails = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [selectedColor, setSelectedColor] = useState('');
-    const [isInWishlist, setIsInWishlist] = useState(false); // State to track if item is in wishlist
+    const [isInWishlist, setIsInWishlist] = useState(false);
+    const [isAddingToCart, setIsAddingToCart] = useState(false); // Loading state for Add to Cart
+    const [isTogglingWishlist, setIsTogglingWishlist] = useState(false); // Loading state for Wishlist
     const api = 'https://backend-production-6ac7.up.railway.app';
 
     useEffect(() => {
@@ -28,10 +30,17 @@ const ItemDetails = () => {
                 if (response.data.colors.length > 0) {
                     setSelectedColor('');
                 }
-                // Check if the item is already in the wishlist
+        
                 const wishlistResponse = await axios.get(`${api}/getWishlistItems/${state.user.uid}`);
-                const isItemInWishlist = wishlistResponse.data.some(wishlistItem => wishlistItem.itemId._id === id);
-                setIsInWishlist(isItemInWishlist);
+        
+                if (wishlistResponse.data.length === 0) {
+                    setIsInWishlist(false);
+                } else {
+                    const isItemInWishlist = wishlistResponse.data.some(wishlistItem => 
+                        wishlistItem.itemId && wishlistItem.itemId._id === id
+                    );
+                    setIsInWishlist(isItemInWishlist);
+                }
             } catch (error) {
                 console.error("Error fetching item details:", error);
                 message.error("Failed to fetch item details");
@@ -71,12 +80,15 @@ const ItemDetails = () => {
             imageUrl: item.imageUrls[currentImageIndex]
         };
 
+        setIsAddingToCart(true); // Set loading state to true
         try {
             await axios.post(`${api}/addToCart`, cartData);
             message.success("Item added to cart successfully!");
         } catch (error) {
             console.error("Error adding item to cart:", error);
             message.error("Failed to add item to cart");
+        } finally {
+            setIsAddingToCart(false); // Reset loading state
         }
     };
 
@@ -94,14 +106,13 @@ const ItemDetails = () => {
             userId: state.user.uid
         };
 
+        setIsTogglingWishlist(true); // Set loading state to true
         try {
             if (isInWishlist) {
-                // Remove from wishlist
                 await axios.delete(`${api}/removeFromWishlist/${item._id}`);
                 setIsInWishlist(false);
                 message.success("Item removed from wishlist successfully!");
             } else {
-                // Add to wishlist
                 await axios.post(`${api}/addToWishlist`, wishlistData);
                 setIsInWishlist(true);
                 message.success("Item added to wishlist successfully!");
@@ -109,6 +120,8 @@ const ItemDetails = () => {
         } catch (error) {
             console.error("Error toggling wishlist:", error);
             message.error("Failed to toggle wishlist ");
+        } finally {
+            setIsTogglingWishlist(false); // Reset loading state
         }
     };
 
@@ -133,7 +146,7 @@ const ItemDetails = () => {
             <div className='main' style={styles.itemDetailsPage}>
                 <Row gutter={16} style={{ width: '100%', maxWidth: '1200px', margin: '80px auto', background: '#fff', padding: '30px', borderRadius: '10px' }}>
                     <Col xs={24} md={12} style={styles.imageContainer}>
-                        <LeftOutlined onClick={() => setCurrentImageIndex((currentImageIndex - 1 + item.imageUrls.length) % item.imageUrls.length)} style={{ ...styles.navIcon, left: '10px' }} />
+                    <LeftOutlined onClick={() => setCurrentImageIndex((currentImageIndex - 1 + item.imageUrls.length) % item.imageUrls.length)} style={{ ...styles.navIcon, left: '10px' }} />
                         <img
                             src={`${api}${item.imageUrls[currentImageIndex]}`}
                             alt={item.name}
@@ -176,15 +189,25 @@ const ItemDetails = () => {
                         </div>
 
                         <div style={styles.buttonContainer}>
-                            <Button 
-                                type="default" 
-                                icon={<HeartOutlined style={{ color: isInWishlist ? 'red' : 'inherit' }} />} 
-                                className="iconButton" 
+                            <Button
+                                type="default"
+                                icon={<HeartOutlined style={{ color: isInWishlist ? 'red' : 'inherit' }} />}
+                                className="iconButton"
                                 onClick={toggleWishlist}
+                                loading={isTogglingWishlist} // Show loading state
                             >
-                                {isInWishlist ? 'Remove from Favorites' : 'Add to Favorites'}
+                                {isInWishlist ? 'Remove from Favourite' : 'Add to Favorites'}
                             </Button>
-                            <Button type="primary" icon={<ShoppingCartOutlined />} style={{ backgroundColor: '#16a34a' }} className="cartButton" onClick={addToCart}>Add to Cart</Button>
+                            <Button
+                                type="primary"
+                                icon={<ShoppingCartOutlined />}
+                                style={{ backgroundColor: '#16a34a' }}
+                                className="cartButton"
+                                onClick={addToCart}
+                                loading={isAddingToCart} // Show loading state
+                            >
+                                {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                            </Button>
                         </div>
                     </Col>
                 </Row>
@@ -228,7 +251,7 @@ const styles = {
         transform: 'translateY(-50%)',
         fontSize: '24px',
         cursor: 'pointer',
- backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         color: '#fff',
         padding: '10px',
         borderRadius: '50%',

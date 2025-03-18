@@ -12,12 +12,15 @@ const CartPage = () => {
   const { state } = useAuth(); // Get user state from auth context
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false); 
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const api = 'https://backend-production-6ac7.up.railway.app'
 
   const handleCheckout = () => {
+    setIsProcessingOrder(true);
     navigate("/checkout"); // Navigate to the checkout page
+    setIsProcessingOrder(false); // Reset loading state  
   };
 
   useEffect(() => {
@@ -107,7 +110,7 @@ const CartPage = () => {
       </Row>
       <div style={styles.totalContainer}>
         <Text style={{ fontSize: "18px", color: "#fff" }}>Grand Total: RS {calculateTotal()}</Text><br />
-        <Button type="primary" style={styles.checkoutButton} onClick={handleCheckout}>Check out</Button>
+        <Button type="primary" loading={isProcessingOrder} style={styles.checkoutButton} onClick={handleCheckout} disabled={calculateTotal() === "0.00" || cartItems.length === 0}>Check out</Button>
       </div>
     </div>
   );

@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useAuth } from '../../../context/authContext';
 import bg from "../../../assets/images/bg3.jpg"; // Import your background image
-import { Button, Card, Col, Row, Input, message } from 'antd';
+import { Button, Card, Col, Row, Input, message, Typography } from 'antd';
 import { CopyOutlined } from '@ant-design/icons'; // Import the copy icon
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+
+const { Title, Text } = Typography;
 
 const Checkout = () => {
     const { state } = useAuth();
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errors, setErrors] = useState({});
+    const [isProcessingOrder, setIsProcessingOrder] = useState(false); // Loading state for checkout
     const navigate = useNavigate();
-    const api = 'https://backend-production-6ac7.up.railway.app'
+    const api = 'https://backend-production-6ac7.up.railway.app';
     
     const [userDetails, setUserDetails] = useState({
         firstName: '',
@@ -61,13 +64,14 @@ const Checkout = () => {
 
     const handleCheckout = async () => {
         if (!validateForm()) return;
-        
+
         const orderData = {
             userId: state.user.uid,
             items: cartItems,
             userDetails,
         };
 
+        setIsProcessingOrder(true); // Set loading state to true
         try {
             await axios.post(`${api}/storeOrder`, orderData);
             message.success("Order placed successfully!");
@@ -85,6 +89,8 @@ const Checkout = () => {
         } catch (error) {
             console.error("Error placing order:", error);
             message.error("Failed to place order");
+        } finally {
+            setIsProcessingOrder(false); // Reset loading state
         }
     };
 
@@ -167,7 +173,15 @@ const Checkout = () => {
                         <Input placeholder="Phone" style={styles.inputField} onChange={(e) => setUserDetails({ ...userDetails, phone: e.target.value })} />
                         {errors.phone && <p style={styles.errorText}>{errors.phone}</p>}
                         
-                        <Button type="primary" style={styles.checkoutButton} onClick={handleCheckout}>Complete Order</Button>
+                        <Button 
+                            type="primary" 
+                            style={styles.checkoutButton} 
+                            onClick={handleCheckout} 
+                            loading={isProcessingOrder} // Show loading state
+                            disabled={calculateTotal() === "0.00" || cartItems.length === 0} // Disable if total is 0 or no items
+                        >
+                            Complete Order
+                        </Button>
                     </Card>
                 </Col>
             </Row>

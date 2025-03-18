@@ -105,7 +105,7 @@ export default function AddItems() {
             colors: colors.length ? colors : [""] , // Set colors to an array with an empty string if no colors are provided
             description // Include description in the form data
         };
-        console.log(formData);
+        // console.log(formData);
         setIsLoading(true);
         try {
             await axios.post(`${api}storeItem`, formData);

@@ -50,6 +50,7 @@ const HomePage = () => {
     const [items, setItems] = useState([]); // State to hold items
     const [loading, setLoading] = useState(true); // State to track loading status
     const [cartItemCount, setCartItemCount] = useState(0); // State for cart item count
+    const [visibleItemIndex, setVisibleItemIndex] = useState(0); // State to track the currently visible item
     const categoryRef = useRef(null); // Reference for the category section
     const api = 'https://backend-production-6ac7.up.railway.app';
 
@@ -60,8 +61,6 @@ const HomePage = () => {
 
         return () => clearInterval(interval); // Cleanup interval on unmount
     }, []);
-
-
     useEffect(() => {
         // Fetch items from the backend
         const fetchItems = async () => {
@@ -128,6 +127,13 @@ const HomePage = () => {
         }
     };
 
+
+    const showMoreItems = () => {
+        if (visibleItemIndex < sortedItems.length - 9) {
+            setVisibleItemIndex(visibleItemIndex + 9);
+        }
+    };
+
     return (
         <div style={styles.homepage}>
             <div style={styles.imageContainer}>
@@ -160,7 +166,7 @@ const HomePage = () => {
             <div className="container mt-5">
                 <h2 className="text-center text-white">All Items</h2>
                 <div className="row mt-4">
-                    {items.map((item) => (
+                    {sortedItems.slice(0, visibleItemIndex + 1).map((item) => (
                         <div key={item._id} className="col-6 col-md-3 mb-4">
                             <Link to={`/item/${item._id}`} className="text-decoration-none">
                                 <div className="card shadow-sm">
@@ -182,6 +188,11 @@ const HomePage = () => {
                         </div>
                     ))}
                 </div>
+                {visibleItemIndex < sortedItems.length - 9 && (
+                    <button onClick={showMoreItems} style={styles.showMoreButton}>
+                        Show More
+                    </button>
+                )}
             </div>
             {/* WhatsApp Button */}
             <a
@@ -275,8 +286,7 @@ const styles = {
     },
     imageWrapper: {
         height: '300px'
-    },
-    itemsContainer: {
+    },    itemsContainer: {
         display: 'flex',
         flexWrap: 'wrap', // Allow items to wrap to the next line
         justifyContent: 'center', // Center items horizontally
@@ -326,7 +336,6 @@ const styles = {
         height: 'auto',
         position: 'relative',
         overflow: 'hidden',
-        // objectFit: 'cover',
     },
     discountOverlay: {
         position: 'absolute',
@@ -340,6 +349,17 @@ const styles = {
     },
     discountText: {
         fontSize: '16px',
+    },
+    // Show More Button Styles
+    showMoreButton: {
+        backgroundColor: '#16a34a',
+        color: 'white',
+        border: 'none',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        fontSize: '16px',
+        marginTop: '20px',
     },
     // WhatsApp Button Styles
     whatsappButton: {
