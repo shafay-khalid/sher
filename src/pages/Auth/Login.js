@@ -59,7 +59,7 @@ export default function Login() {
       const userData = {
         fullName: user.displayName,
         email: user.email,
-        role: 'user.role',
+        role: user.role,
         profilePic: user.photoURL || '',
       };
       await setDoc(doc(firestore, 'users', user.uid), userData);

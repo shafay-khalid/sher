@@ -144,7 +144,7 @@ const ItemDetails = () => {
     return (
         <>
             <div className='main' style={styles.itemDetailsPage}>
-                <Row gutter={16} style={{ width: '100%', maxWidth: '1200px', margin: '80px auto', background: '#fff', padding: '30px', borderRadius: '10px' }}>
+                <Row gutter={16} style={{ width: '100%', maxWidth: '1200px',minHeight:'500px', margin: '80px auto', background: '#fff', padding: '30px', borderRadius: '10px' }}>
                     <Col xs={24} md={12} style={styles.imageContainer}>
                     <LeftOutlined onClick={() => setCurrentImageIndex((currentImageIndex - 1 + item.imageUrls.length) % item.imageUrls.length)} style={{ ...styles.navIcon, left: '10px' }} />
                         <img

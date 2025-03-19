@@ -112,25 +112,25 @@ const HomePage = () => {
                 if (scrollLeft + clientWidth >= scrollWidth) {
                     categoryRef.current.scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
-                    categoryRef.current.scrollBy({ left: 310, behavior: 'smooth' }); // Changed to 315px
+                    categoryRef.current.scrollBy({ left: 315, behavior: 'smooth' }); // Changed to 315px
                 }
             }
-        }, 5000); // Change scroll every 3 seconds
+        }, 4000); // Change scroll every 3 seconds
 
         return () => clearInterval(scrollInterval); // Cleanup interval on unmount
     }, []);
 
     const handleScroll = (direction) => {
         if (categoryRef.current) {
-            const scrollAmount = direction === 'left' ? -310 : 310; // Changed to 315px
+            const scrollAmount = direction === 'left' ? -315 : 315; // Changed to 315px
             categoryRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
 
 
     const showMoreItems = () => {
-        if (visibleItemIndex < sortedItems.length - 9) {
-            setVisibleItemIndex(visibleItemIndex + 9);
+        if (visibleItemIndex < sortedItems.length - 5) {
+            setVisibleItemIndex(visibleItemIndex + 5);
         }
     };
 
@@ -166,7 +166,7 @@ const HomePage = () => {
             <div className="container mt-5">
                 <h2 className="text-center text-white">All Items</h2>
                 <div className="row mt-4">
-                    {sortedItems.slice(0, visibleItemIndex + 1).map((item) => (
+                    {sortedItems.slice(0, visibleItemIndex + 5).map((item) => (
                         <div key={item._id} className="col-6 col-md-3 mb-4">
                             <Link to={`/item/${item._id}`} className="text-decoration-none">
                                 <div className="card shadow-sm">
@@ -188,7 +188,7 @@ const HomePage = () => {
                         </div>
                     ))}
                 </div>
-                {visibleItemIndex < sortedItems.length - 9 && (
+                {visibleItemIndex < sortedItems.length - 5 && (
                     <button onClick={showMoreItems} style={styles.showMoreButton}>
                         Show More
                     </button>
