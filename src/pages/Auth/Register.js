@@ -49,7 +49,7 @@ export default function Register() {
       message.success("User  registered successfully");
     } catch (error) {
       console.error("Registration failed: ", error);
-      message.error("Registration failed: " + error.message);
+      message.error("Registered" + error.message);
     }
   };
 
@@ -82,7 +82,7 @@ export default function Register() {
       resetForm(); // Reset form after successful registration
       navigate('/'); // Redirect to home or another page
     } catch (error) {
-      console.error("Error during Google sign-in: ", error); // Log the error for debugging
+      console.error("sign-in ", error); 
       handleError(error); // Handle error
     } finally {
       setLoading(false);

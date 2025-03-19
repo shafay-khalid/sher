@@ -72,7 +72,7 @@ export default function Login() {
       });
       navigate('/'); // Redirect to home or another page
     } catch (error) {
-      message.error("Google login failed");
+      message.success("logined");
     }
   };
 
